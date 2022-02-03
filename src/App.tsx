@@ -1,55 +1,38 @@
 import React, { useState, useEffect } from "react";
 import Movie from "./components/Movie";
+import MovieForm from "./components/MovieForm";
+
+interface MovieSet {
+  id: Date;
+  title: string;
+  year: number;
+}
 
 function App() {
-  const [movieTitle, setMovieTitle] = useState("");
-  const [movieYear, setMovieYear] = useState("");
-  const [movies, setMovies] = useState([
-    { title: "kossie coder1", year: "2001" },
-    { title: "kossie coder2", year: "2002" },
-    { title: "kossie coder3", year: "2003" },
-    { title: "kossie coder4", year: "2004" },
-  ]);
+  const [movies, setMovies] = useState<MovieSet[]>([]);
 
-  useEffect(() => {
-    console.log("render");
-  });
+  const removeMovie = (id: Date) => {
+    setMovies(
+      movies.filter((movie) => {
+        return movie.id !== id;
+      })
+    );
+  };
 
-  const renderMovies = movies.map((movie) => {
-    return <Movie movie={movie} key={movie.title} />;
-  });
+  const renderMovies = movies.length
+    ? movies.map((movie) => {
+        return <Movie movie={movie} key={movie.id} removeMovie={removeMovie} />;
+      })
+    : "추가된 영화가 없습니다.";
 
-  const addMovie = (e: any) => {
-    e.preventDefault();
-    setMovies([
-      ...movies,
-      {
-        title: movieTitle,
-        year: movieYear,
-      },
-    ]);
+  const addMovie = (movie: MovieSet) => {
+    setMovies([...movies, movie]);
   };
 
   return (
     <div className="App">
       <h1>Movie List</h1>
-      <form onSubmit={addMovie}>
-        <input
-          type="text"
-          value={movieTitle}
-          placeholder="영화제목"
-          onChange={(e) => setMovieTitle(e.target.value)}
-        />
-        <br />
-        <input
-          type="text"
-          value={movieYear}
-          placeholder="개봉년도"
-          onChange={(e) => setMovieYear(e.target.value)}
-        />
-        <br />
-        <button type="submit">영화추가</button>
-      </form>
+      <MovieForm addMovie={addMovie} />
       {renderMovies}
     </div>
   );
